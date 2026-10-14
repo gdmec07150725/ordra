@@ -1,20 +1,19 @@
 # Ordra · 订单客服 Agent
 
-Ordra 是基于 **Python、FastAPI、LangGraph 和 MCP** 的电商客服演示项目。围绕模拟订单查询、政策检索和退货申请，实现多轮对话、工具调用、人工审批、检查点恢复与离线评测。
+Ordra 是基于 **Python、FastAPI、LangGraph 和 MCP** 的订单客服应用，提供订单查询、政策检索、退货申请处理和多轮对话。执行过程包含工具调用、人工审批、结果校验与检查点恢复，可在网页中查看每次任务的证据和状态。
 
-订单、业务政策和分析 CSV 均为示例数据。退货流程只创建本地模拟申请，没有连接真实订单系统或支付退款接口。
+当前订单、业务政策和分析 CSV 均为模拟数据。退货流程创建本地模拟申请，尚未接入真实订单系统或支付退款接口。
 
 ![Ordra 订单客服界面](docs/images/order-agent.jpg)
 
 ## 功能
 
-- **订单与政策查询**：通过本地 MCP 服务查询订单、检索知识库；回答保留实际检索来源。
-- **可恢复的执行流程**：LangGraph 组织上下文、模型决策、工具、委派、审批和结果校验；SQLite 保存会话及检查点。
-- **人工审批与确认**：生成退货预览前可批准、修改参数或拒绝；预览另需用户确认，才创建模拟申请。
-- **上下文管理**：token 预算、滚动摘要、当前任务压缩和会话原文检索，保留完整持久化历史。
-- **按需加载与委派**：工具发现、Skills 主指引及引用资料按需读取；订单与知识子 Agent 使用独立上下文并共享预算。
-- **执行记录与评测**：记录工具证据、审批、恢复、请求数与已报告用量；提供单轮、多轮、MCP、Skills 和策略对照评测。
-- **代码分析实验**：对模拟订单 CSV 生成并运行 Python 子集代码，由宿主独立重算结果，通过后导出 Markdown/CSV。
+- **订单与政策查询**：通过本地 MCP 服务查询订单、检索知识库，并在回答中保留实际检索来源。
+- **审批与恢复**：退货预览支持批准、修改参数或拒绝；SQLite 保存会话、人工决定与执行检查点。
+- **上下文管理**：结合 token 预算、滚动摘要、当前任务压缩与会话原文检索，保留完整持久化历史。
+- **按需加载与委派**：按任务发现工具、加载 Skills 指引及引用资料；订单和知识子 Agent 使用独立上下文并共享执行预算。
+- **执行记录**：查看工具证据、计划、审批、失败恢复、模型请求数及已报告的 token 用量。
+- **订单数据分析**：为模拟订单 CSV 生成 Python 子集代码，在 Monty 独立工作进程中执行；宿主重算并核对结果后，提供 Markdown 和 CSV 报告。
 
 ## 架构
 
@@ -36,22 +35,13 @@ flowchart TD
     V --> UI
 ~~~
 
-| 入口或模块 | 作用 |
-| --- | --- |
-| `/`、`api_app.py`、`full_agent_graph.py` | 多轮主聊天与 LangGraph 执行 |
-| `mcp_tool_client.py`、`mcp_tool_server.py` | 固定的本地 stdio 工具服务与调用 |
-| `human_approval.py`、`checkpoint_store.py` | 审批决定、归属校验与恢复 |
-| `knowledge_base.py`、`local_embeddings.py` | 关键词 / 本地向量混合检索 |
-| `/runs` | 执行轨迹与上下文预算 |
-| `/graph` | 单问题 LangGraph 对照实验 |
-| `/code` | Monty 代码分析实验 |
-| `tests/`、`*_eval.py` | 回归测试与场景评测 |
+主聊天使用 LangGraph 编排上下文、模型决策、工具、委派、审批和校验节点。MCP 服务通过标准输入输出提供只读订单查询与知识检索，由应用管理进程生命周期，无需单独启动或配置额外服务端口。
 
 ## 快速开始
 
-建议 **Python 3.12+**。当前开发环境已在 **Python 3.14** 验证；其他版本及全新依赖安装仍需在目标环境验证。依赖固定在 `requirements.txt`，前端无需 Node.js 构建。
+建议使用 **Python 3.12+**；当前验证环境为 **Python 3.14**。直接依赖版本固定在 `requirements.txt`，前端使用原生 HTML/CSS/JavaScript，无需 Node.js 构建。
 
-克隆仓库并进入 Ordra 项目目录后，创建环境并安装依赖：
+在 PowerShell 中克隆仓库、创建虚拟环境并安装依赖：
 
 ~~~powershell
 git clone https://github.com/gdmec07150725/ordra.git
@@ -62,52 +52,53 @@ python -m venv .venv
 Copy-Item .env.example .env
 ~~~
 
-在 `.env` 中填写自己的 `DEEPSEEK_API_KEY`，并将 `DEEPSEEK_MODEL` 替换为账号可用的模型名称。随后启动：
+编辑 `.env`，填写自己的 `DEEPSEEK_API_KEY`，将 `DEEPSEEK_MODEL` 替换为账号可用的模型名称，然后启动服务：
 
 ~~~powershell
 .\.venv\Scripts\python.exe -X utf8 07_api_server.py
 ~~~
 
-打开 [聊天页面](http://127.0.0.1:8000)、[健康检查](http://127.0.0.1:8000/api/health) 或 [接口文档](http://127.0.0.1:8000/docs)。服务默认监听 `127.0.0.1:8000`，使用单进程；首次启动会自动创建 `data/` 中的数据库。
+打开 [Ordra](http://127.0.0.1:8000)。服务默认以单进程监听 `127.0.0.1:8000`，首次启动自动创建 `data/` 中的 SQLite 数据库；[健康检查](http://127.0.0.1:8000/api/health)和[接口文档](http://127.0.0.1:8000/docs)可用于确认运行状态。
 
-macOS / Linux 使用 `.venv/bin/python` 替换上述解释器路径，复制配置使用 `cp .env.example .env`。
-
-可以尝试：
-
-> 查询 O1003 的状态和退货政策。
-> O1003 的耳机左侧没有声音，请帮我准备退货申请。
-
-生成预览前，页面会要求人工审批；批准后再核对预览并确认提交。没有模型密钥时可运行下面的离线评测与基础订单查询：
-
-~~~powershell
-.\.venv\Scripts\python.exe -X utf8 02_query_order.py O1001
-~~~
+macOS / Linux 将解释器路径替换为 `.venv/bin/python`，复制配置使用 `cp .env.example .env`。没有模型密钥时，仍可运行离线测试、场景评测与 `02_query_order.py O1001`。
 
 ## 配置
 
-环境变量优先于 `.env`；修改配置后重启服务。`.env.example` 只包含占位字段和演示设置。
+环境变量优先于 `.env`；修改配置后重启服务。`.env.example` 包含占位字段和可运行的检索、预算设置，真实密钥应仅保存在自己的环境中。
 
 | 变量 | 说明 |
 | --- | --- |
-| `DEEPSEEK_API_KEY` | 自行填写；离线评测不需要 |
-| `DEEPSEEK_MODEL` | 自行填写可用模型名；应用通过 DeepSeek 兼容 API 调用 |
-| `AGENT_TOOL_MODE` | `mcp` 为默认模式；`local` 用于本地直接调用对照 |
-| `AGENT_HISTORY_SEARCH` | `keywords` 只用关键词；`hybrid` 启用本地向量混合检索 |
+| `DEEPSEEK_API_KEY` | 模型服务密钥；离线评测不需要 |
+| `DEEPSEEK_MODEL` | 账号可用的模型名称；应用通过 DeepSeek 兼容 API 调用 |
+| `AGENT_TOOL_MODE` | `mcp` 为默认模式；`local` 使用本地直接调用路径 |
+| `AGENT_HISTORY_SEARCH` | 示例为 `keywords`；`hybrid` 启用关键词与本地向量混合检索 |
 | `AGENT_CONTEXT_TOKENS` | 总上下文预算，示例为 `32768` |
 | `AGENT_RECENT_TOKENS` | 近期完整历史目标预算，示例为 `2048` |
 | `AGENT_SUMMARY_TOKENS` | 滚动摘要预算，示例为 `512` |
 
-示例配置使用关键词检索，无需下载向量模型。需要混合检索时，先运行下面的命令下载模型，再将 `AGENT_HISTORY_SEARCH` 改为 `hybrid` 并重启：
+关键词检索无需下载向量模型。使用混合检索时，先运行以下命令，再将 `AGENT_HISTORY_SEARCH` 改为 `hybrid` 并重启：
 
 ~~~powershell
 .\.venv\Scripts\python.exe -X utf8 local_embeddings.py
 ~~~
 
-模型文件保存在 `.local/embeddings/`。服务只读取本地模型，缺失或不可用时回退到关键词检索。知识库位于 `knowledge/`，技能位于 `skills/`；被选中的知识片段和技能内容会进入聊天模型上下文。
+模型文件保存在 `.local/embeddings/`。服务只读取本地模型，缺失或不可用时回退到关键词检索。知识库位于 `knowledge/`，技能位于 `skills/`；选中的知识片段和技能内容会进入聊天模型上下文。
 
-## 离线评测
+## 关键工作流
 
-以下命令用脚本模型或模拟传输替代外部模型 API，业务工具、临时 SQLite 数据库和对应的本地 MCP / 沙箱仍实际运行：
+**查询订单与政策。** 在聊天页输入“查询 O1003 的状态和退货政策”。Agent 按需发现查询工具，获取订单事实和政策原文，完成结果校验后回复；来源卡片可查看检索依据。
+
+**处理退货申请。** 输入“O1003 的耳机左侧没有声音，请帮我准备退货申请”。页面先展示待审批参数，可批准、修改后批准或拒绝。批准后生成预览，再由用户确认创建模拟申请；[售后审核](http://127.0.0.1:8000/returns)支持人工审核。审批、提交和审核均不代表真实退款已完成。
+
+**恢复中断任务。** 刷新页面或重启服务后，可从未完成任务的检查点继续，复用已保存的工具结果。恢复沿用原任务预算；尚未保存的只读工作可能重做，也可放弃任务后重新提问。
+
+**分析订单数据。** 在[数据分析](http://127.0.0.1:8000/code)中选择模拟 CSV 和统计目标，查看生成代码、执行反馈及核对结果。只有通过宿主独立校验的任务才提供报告下载；服务重启后的未完成分析需要重新运行。
+
+[执行记录](http://127.0.0.1:8000/runs)展示任务轨迹与上下文预算；[LangGraph 流程对照](http://127.0.0.1:8000/graph)提供独立的单问题执行入口。
+
+## 开发与测试
+
+在仓库根目录运行：
 
 ~~~powershell
 .\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
@@ -117,30 +108,40 @@ macOS / Linux 使用 `.venv/bin/python` 替换上述解释器路径，复制配�
 .\.venv\Scripts\python.exe -X utf8 code_eval.py
 ~~~
 
-场景评测在 `.local/evals/` 生成 JSON 和 HTML 报告；失败时返回非零退出码。按需运行 `decision_eval.py` 比较主管直查、子任务委派等策略。
+上述命令使用脚本模型或模拟传输替代外部模型 API；业务工具、临时 SQLite 数据库及对应的 MCP 服务、代码沙箱实际运行。`agent_eval.py --suite all` 覆盖单轮、多轮和 Skills 场景；其他入口分别比较 MCP、LangGraph 流程并验证代码分析。
 
-只有显式加入 `--live` 的场景评测才调用配置模型并产生用量。离线通过率验证的是执行流程与约束，不能当作真实模型准确率、生产可用率或成本收益。
+场景评测在 `.local/evals/` 生成 JSON 和 HTML 报告，失败时返回非零退出码。需要比较主管直查与子任务委派策略时，可运行 `decision_eval.py`。
 
-## 实现边界
+场景评测只有显式加入 `--live` 才调用配置模型并产生用量。离线结果验证执行流程与规则约束，不代表真实模型准确率、生产可用率或成本收益。
 
-- 当前是本地教学与工程验证项目，没有用户登录、真实订单权限系统或公网多租户部署方案。
-- 已保存的工具结果可在恢复时复用；尚未保存的只读工作可能重做。恢复不重置预算。
-- 结果校验包含模型判断与程序约束，仍可能漏掉语义错误；模拟申请不代表退款成功。
-- 工具按需发现可能增加模型请求，小工具目录不保证降低总 token 或耗时。
-- Monty 支持 Python 子集，未提供任意依赖安装；代码分析任务中断后需要重新运行。
-- 模型微调仅有[实施方案](docs/本项目如何做模型微调.md)，尚未训练模型。
+## 目录与技术文档
 
-## 文档
+| 路径 | 职责 |
+| --- | --- |
+| `web/`、`api_app.py` | 网页、HTTP/SSE 接口及会话管理 |
+| `full_agent_graph.py`、`agent_service.py` | 主聊天图、Agent 公共入口与工具适配 |
+| `mcp_tool_client.py`、`mcp_tool_server.py` | MCP 连接、工具定义发现与调用 |
+| `human_approval.py`、`checkpoint_store.py` | 人工决定、会话归属校验与恢复 |
+| `knowledge/`、`skills/`、`examples/` | 政策资料、处理指引与模拟数据 |
+| `tests/`、`*_eval.py` | 回归测试与场景评测 |
+| `data/`、`.local/` | 本地运行数据、模型和报告，不纳入版本管理 |
 
-从[学习指南](docs/learning-guide.md)了解从 Python 函数到完整 Agent 的演进，或直接阅读：
+按模块阅读：
 
-- [FastAPI 与网页聊天](docs/06_FastAPI接口与网页聊天.md)
-- [上下文管理](docs/08_上下文管理.md)与[RAG](docs/10_业务知识库RAG使用.md)
-- [子 Agent 委派](docs/11_子Agent接入与任务委派.md)
-- [MCP 与工具发现](docs/12_MCP接入与工具按需发现.md)
-- [Skills 按需加载](docs/13_Skills接入与按需加载.md)
-- [代码执行与沙箱](docs/14_代码执行Agent与沙箱隔离.md)
-- [执行策略实验](docs/Agent执行策略实验.md)
+- [HTTP 与流式接口](docs/06_FastAPI接口与网页聊天.md)、[SQLite 持久化](docs/07_SQLite会话持久化.md)
+- [上下文管理](docs/08_上下文管理.md)、[会话原文检索](docs/09_历史检索工具.md)、[知识库检索](docs/10_业务知识库RAG使用.md)
+- [子 Agent 委派](docs/11_子Agent接入与任务委派.md)、[MCP 与工具发现](docs/12_MCP接入与工具按需发现.md)
+- [Skills 按需加载](docs/13_Skills接入与按需加载.md)、[代码执行与沙箱](docs/14_代码执行Agent与沙箱隔离.md)
+- [执行策略评测](docs/Agent执行策略实验.md)
+
+## 当前限制
+
+- 默认面向本地单进程运行，没有用户登录、真实订单权限校验或公网多租户部署能力。
+- 订单、政策和 CSV 均为模拟资料；退货申请仅保存到本地 SQLite，未接入真实业务系统或支付接口。
+- 结果校验结合模型判断与程序约束，仍可能遗漏语义错误；重要业务结论需要人工核对。
+- 工具按需发现可能增加模型请求，小工具目录不保证降低总 token 用量或耗时。
+- MCP 目前只连接固定的本地只读服务；Skills 不执行脚本，也不增加工具权限。
+- Monty 支持 Python 子集，不提供任意依赖安装或通用容器环境；代码分析的恢复机制与主聊天检查点不同。
 
 ## 许可证
 
