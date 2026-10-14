@@ -1,0 +1,39 @@
+# Credentials and personal configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Virtual environments and Python caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local conversations, checkpoints, reports, models and logs
+data/
+.local/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log
+.coverage
+htmlcov/
+
+# Migration backups and personal development notes
+.migration-backup/
+docs/superpowers/
+docs/Python学习路线与Agent岗位面试要求.md
+docs/AI_Agent面试题与参考答案.md
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

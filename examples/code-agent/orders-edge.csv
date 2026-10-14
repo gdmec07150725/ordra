@@ -1,0 +1,8 @@
+order_id,product,channel,status
+E001,全退商品,网页,refunded
+E002,全退商品,App,refunded
+E003,无退款商品,网页,completed
+E004,无退款商品,App,cancelled
+E005,混合商品,网页,refunded
+E006,混合商品,App,cancelled
+E007,混合商品,网页,paid

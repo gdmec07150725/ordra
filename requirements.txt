@@ -1,0 +1,22 @@
+# DeepSeek 官方示例使用的兼容 API 客户端。
+openai==3.13.0
+# 从本机 .env 文件读取配置。
+python-dotenv==1.2.3
+# 当前 SDK 的 HTTP 库；流式示例直接使用它识别响应读取异常。
+httpx2==2.12.0
+# 第六课：HTTP 接口、运行服务、请求校验与异步清理。
+fastapi==0.141.1
+uvicorn==0.52.4
+pydantic==2.13.5
+anyio==4.15.1
+# 中文历史语义检索，在本机 CPU 运行 ONNX 模型。
+fastembed==0.8.0
+# LangGraph 对照流程：图编排与 SQLite 检查点。
+langgraph==1.2.11
+langgraph-checkpoint-sqlite==3.1.1
+# 本地 stdio 工具服务与工具定义发现，使用官方 MCP SDK。
+mcp==2.2.0
+jsonschema==4.26.0
+PyYAML==6.0.3
+# 代码执行实验：独立 worker 中的 Python 子集沙箱，不开放宿主能力。
+pydantic-monty==0.0.23

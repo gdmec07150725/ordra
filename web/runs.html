@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ordra · 执行记录</title><link rel="stylesheet" href="/static/runs.css?v=21.0">
+  <script src="/static/runs.js?v=23.0" defer></script>
+</head>
+<body><main>
+  <header><div><p class="eyebrow">Ordra</p><h1>执行记录</h1><p>查看工具选择、计划变化、人工决定与恢复过程。</p></div><a href="/">返回对话</a></header>
+  <section class="toolbar"><label>选择对话 <select id="session-picker" aria-label="选择对话"></select></label><button id="refresh">刷新记录</button></section>
+  <p id="status" role="status" aria-live="polite">正在读取…</p>
+  <div class="layout"><aside aria-label="本对话执行列表"><ul id="run-list"></ul><button id="load-more" hidden>加载更早记录</button></aside>
+    <section id="detail" aria-label="执行详情"><p class="empty">选择一次执行，查看过程。</p></section></div>
+</main></body></html>

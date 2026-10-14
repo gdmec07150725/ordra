@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ordra · 订单客服</title>
+    <link rel="stylesheet" href="/static/styles.css?v=19.0" />
+    <script src="/static/return-cards.js?v=12.0" defer></script>
+    <script src="/static/plan-card.js?v=22.0" defer></script>
+    <script src="/static/approval-card.js?v=19.0" defer></script>
+    <script src="/static/app.js?v=23.0" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="history-panel" aria-label="历史对话">
+        <div class="history-heading"><h2>历史对话</h2><span id="session-count">0</span></div>
+        <p class="history-hint">每一段对话，随时接着聊</p>
+        <nav aria-label="选择对话"><ul id="session-list" class="session-list"></ul></nav>
+      </aside>
+    <main class="workspace">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">↗</span><div><h1>Ordra</h1><p>有问题，随时聊聊</p></div></div>
+        <div class="topbar-actions"><a class="quiet-button" href="/graph" target="_blank" rel="noopener noreferrer">LangGraph 实验</a><a id="runs-link" class="quiet-button" href="/runs" target="_blank" rel="noopener noreferrer">执行记录</a><a class="quiet-button" href="/returns" target="_blank" rel="noopener noreferrer">售后审核</a><button id="new-chat" class="quiet-button" type="button" disabled>新对话 <span aria-hidden="true">＋</span></button></div>
+      </header>
+      <div class="session-bar"><span id="active-session-title" class="demo-tag">正在载入对话…</span><a href="/code" target="_blank" rel="noopener noreferrer">数据分析实验 ↗</a><span id="connection">正在连接…</span></div>
+
+      <div class="chat-frame">
+      <section class="chat-area" aria-label="订单对话" tabindex="0">
+        <div id="welcome" class="welcome">
+          <div class="welcome-icon" aria-hidden="true">✳</div>
+          <p class="eyebrow">你的订单小助手</p>
+          <h2>这次想查哪笔订单？</h2>
+          <p class="intro">查询订单、了解售后政策，或申请模拟退货。<br />也可以接着上一句话继续问。</p>
+          <div class="suggestions">
+            <button type="button" data-question="我的 O1001 订单到哪里了？"><span>查一下物流</span><small>我的 O1001 订单到哪里了？</small><b aria-hidden="true">↗</b></button>
+            <button type="button" data-question="我想为 O1003 申请退货"><span>试试退货申请</span><small>补充原因，核对后确认提交</small><b aria-hidden="true">↗</b></button>
+          </div>
+          <p class="sample-note">可试用订单：O1001、O1002、O1003</p>
+        </div>
+        <div id="messages" class="messages" role="log" aria-label="聊天记录" aria-live="off"></div>
+      </section>
+      <button id="scroll-bottom" class="scroll-bottom" type="button" hidden><span aria-hidden="true">↓</span> 回到底部</button>
+      </div>
+
+      <footer class="composer-area">
+        <section id="recovery-panel" class="recovery-panel" aria-label="恢复未完成任务" hidden>
+          <p id="recovery-description">上次执行尚未完成，可以从已保存的进度继续。</p>
+          <div><button id="resume-run" class="quiet-button" type="button">继续执行</button><button id="discard-run" class="quiet-button" type="button">放弃本次执行</button></div>
+        </section>
+        <p id="status" class="status" role="status" aria-live="polite">正在准备会话…</p>
+        <form id="chat-form" class="composer">
+          <label class="sr-only" for="question">输入订单问题</label>
+          <textarea id="question" rows="2" maxlength="2000" placeholder="输入你的问题，比如：O1001 到哪里了？" disabled></textarea>
+          <div class="composer-bottom"><span>Enter 发送 · Shift + Enter 换行</span><button id="send" type="submit" disabled>发送 <span aria-hidden="true">↑</span></button></div>
+        </form>
+        <p class="footnote">模拟订单练习 · 对话保存在本机，关闭网页后也能接着聊。</p>
+      </footer>
+    </main>
+    </div>
+    <dialog id="delete-dialog" aria-labelledby="delete-heading" aria-describedby="delete-description">
+      <form method="dialog">
+        <h2 id="delete-heading">删除这段对话？</h2>
+        <p id="delete-title"></p>
+        <p id="delete-description">这段对话、消息及其中的模拟退货申请将永久删除，无法恢复。</p>
+        <div class="dialog-actions">
+          <button type="submit" value="cancel" class="quiet-button" autofocus>取消</button>
+          <button type="submit" value="delete" class="danger-button">确认删除</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ordra · 数据分析实验</title>
+  <link rel="stylesheet" href="/static/graph.css?v=1">
+  <link rel="stylesheet" href="/static/code.css?v=2">
+  <script src="/static/code.js?v=2" defer></script>
+</head>
+<body>
+  <header class="page-header"><div><p class="eyebrow">Ordra 实验室</p><h1>让助手分析订单数据</h1></div><a class="quiet-button" href="/">返回 Ordra 对话</a></header>
+  <main class="layout">
+    <aside class="panel experiments" aria-label="分析记录">
+      <div class="panel-heading"><h2>分析记录</h2><button id="refresh" class="quiet-button" type="button">刷新</button></div>
+      <p class="muted">关闭页面后仍可回来查看。服务重启中断的实验需重新运行。</p>
+      <ul id="run-list"></ul>
+    </aside>
+    <div class="main-column">
+      <section class="panel">
+        <h2>开始一次分析</h2>
+        <p class="muted">助手生成分析代码，在隔离环境中运行，遇到错误时尝试修正。通过独立计算校验后，才会交付报告。</p>
+        <form id="analysis-form">
+          <div class="form-grid">
+            <label>使用的数据<select id="dataset" name="dataset"><option value="orders-demo">模拟订单</option><option value="orders-edge">边界样例</option></select></label>
+            <label>按什么分组<select id="group-by" name="group_by"><option value="product">商品</option><option value="channel">渠道</option></select></label>
+            <label>退款率关注阈值（%）<input id="threshold" type="number" min="0" max="100" step="1" value="30" required></label>
+            <label>运行方式<select id="exercise"><option value="normal">正常分析</option><option value="runtime_error">练习修复运行错误</option><option value="wrong_result">练习纠正计算结果</option></select></label>
+          </div>
+          <p id="exercise-note" class="muted">统计各分组的订单数与退款率，并标出达到关注阈值的分组。</p>
+          <p class="muted small">统计口径：已退款订单数 ÷ 全部订单数，包含已取消订单。所有文件均为模拟数据。</p>
+          <details><summary>查看数据样例</summary><div class="table-scroll"><table id="preview"></table></div><p id="row-count" class="muted small"></p></details>
+          <div class="form-bottom"><span id="ready" class="muted" role="status">正在检查运行环境…</span><button id="start" type="submit" disabled>开始分析 ↗</button></div>
+        </form>
+      </section>
+      <p id="error" role="alert" hidden></p>
+      <section id="empty" class="panel empty"><h2>看见代码如何变成结果</h2><p class="flow-guide">生成代码 → 隔离执行 → 核对结果 → 修正或交付</p><p class="muted">每次最多尝试 3 轮。你可以展开代码和反馈，观察助手如何改变行动。</p></section>
+      <section id="detail" class="panel" hidden aria-label="分析详情">
+        <div class="panel-heading"><h2 id="status"></h2><button id="cancel" class="quiet-button" type="button" hidden>停止执行</button></div>
+        <p id="description"></p><p id="progress" role="status" aria-live="polite" class="muted"></p>
+        <dl id="metrics" class="metrics"></dl>
+        <p id="run-error" class="failure" hidden></p>
+        <div id="attempts"></div>
+        <section id="report" hidden><h3>已验证的分析结果</h3><p id="report-summary"></p><div class="table-scroll"><table id="report-table"></table></div><div id="downloads" class="downloads"></div><p class="muted small">达到阈值表示需要进一步核查，不能据此确定退款原因。</p></section>
+      </section>
+      <p class="muted small boundary">本实验运行 Python 子集，仅提供所选样例数据；无宿主文件、网络或业务系统访问能力。隔离由专用解释器和独立工作进程提供，不是完整 Python 容器。</p>
+    </div>
+  </main>
+</body>
+</html>

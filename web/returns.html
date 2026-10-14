@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ordra · 售后审核</title>
+  <link rel="stylesheet" href="/static/styles.css?v=12.0" />
+  <link rel="stylesheet" href="/static/returns.css?v=12.0" />
+  <script src="/static/returns.js?v=12.0" defer></script>
+</head>
+<body class="review-page">
+  <main class="review-workspace">
+    <header class="review-header">
+      <div><p class="review-eyebrow">Ordra · 本地模拟 · 人工处理</p><h1>售后审核</h1><p>查看退货申请，记录审核结果和原因。</p></div>
+      <div class="topbar-actions"><a class="quiet-button" href="/">返回对话</a><button type="button" class="quiet-button" id="refresh-reviews">刷新列表</button></div>
+    </header>
+    <nav class="review-filters" aria-label="筛选申请">
+      <button type="button" data-filter="pending" aria-pressed="true">待审核 <span data-count="pending">0</span></button>
+      <button type="button" data-filter="approved" aria-pressed="false">已通过 <span data-count="approved">0</span></button>
+      <button type="button" data-filter="rejected" aria-pressed="false">已拒绝 <span data-count="rejected">0</span></button>
+      <button type="button" data-filter="all" aria-pressed="false">全部 <span data-count="all">0</span></button>
+    </nav>
+    <p id="review-status" class="status" role="status" aria-live="polite">正在载入申请…</p>
+    <div class="review-layout">
+      <aside class="review-queue" aria-label="退货申请列表">
+        <p id="queue-empty" hidden>这个分类下暂无申请。可以返回对话，提交一份模拟退货申请。</p>
+        <ul id="request-list"></ul>
+      </aside>
+      <section class="review-detail" aria-labelledby="detail-heading">
+        <h2 id="detail-heading">选择一份申请</h2>
+        <div id="request-detail"><p>从左侧列表选择申请，查看订单、退货原因和审核记录。</p></div>
+        <form id="review-form" hidden>
+          <fieldset><legend>审核结果</legend>
+            <label><input type="radio" name="decision" value="approved" required /> 审核通过</label>
+            <label><input type="radio" name="decision" value="rejected" required /> 拒绝申请</label>
+          </fieldset>
+          <label for="review-reason" class="reason-label">审核原因 <span>必填</span></label>
+          <textarea id="review-reason" name="reason" rows="4" required maxlength="500" placeholder="说明人工核实的情况，以及通过或拒绝的原因"></textarea>
+          <p class="review-note">提交后会保存审核结果，不能重复修改。审核通过不会执行退款。</p>
+          <button class="confirm-return" type="submit" id="submit-review">提交审核</button>
+        </form>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
